@@ -1,4 +1,5 @@
-function G = TTSVD(A,eplison,r)
+function G = TerTTSVD(A,eplison,r,bt)
+% bt should be [dim-1] dimension vector of 1/2
 dim = size(A);n = dim;
 delta = eplison*norm(reshape(A,[size(A,1),prod(size(A))/size(A,1)]),'fro')/sqrt(length(n)-1)
 C = A; 
@@ -15,27 +16,14 @@ for k = 1:length(n)-1
         fprintf('Input rank should be less than rank of tensor');
         return
     end
-    [U,S,V] = svd(C);E = C - U*S*V';
-    %% r limit part
-    U = U(:,1:r(k+1));S = S(1:r(k+1),:);
-    error = norm(E,'fro');tS = S;
-    %% truncate part
-    for i = size(S,1):-1:1
-        temp = 0;
-        tS(i,i) = 0;
-        tE = C-U*tS*V;
-        if norm(tE,'fro') < delta
-            S = tS;
-            %temp = [temp i];
-            r(k+1) = r(k+1)-1;
-            fprintf('truncated');fprintf('\n');
-        elseif norm(tE,'fro') > delta
-            break;
-        end
+    if bt(k) == 2
+        [M,a,R] = TerDecom(C,r(k+1));
+    elseif bt(k) == 1
+        [M,a,R] = BiDecom(C,r(k+1));
     end
-    %%
-    G{k} = reshape(U(:,1:r(k+1)),[r(k),dim(k),r(k+1)]);
-    C = S*V';
+    error = norm(R,'fro');
+    G{k} = reshape(M(:,1:r(k+1)),[r(k),dim(k),r(k+1)]);
+    C = pinv(M)*C;
     tr(k+1) = r(k+1);
 end
 %tr(length(dim)+1) = 1;
