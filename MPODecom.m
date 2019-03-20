@@ -14,31 +14,36 @@ if n(1)>n(end)
     n = fliplr(n);
 end
 %%
-delta = eplison*norm(reshape(A,[size(A,1),prod(size(A))/size(A,1)]),'fro')/sqrt(length(n)-1)
+delta = eplison*norm(reshape(A,[size(A,1),prod(size(A))/size(A,1)]),'fro')/sqrt(length(n)-1);
 C = A;
 tr = zeros(1, length(n)+1);
 if r(1) ~= 1 && r(end)~=1
-    fprintf('r(1)and r(end) should be 1');
+    fprintf('r(1)and r(end) should be 1\n');
     return;
 end
 tr(1) = 1;tr(end) = 1;
-%%
+%% Decom part
+% Problem is, svd algorithm guarantees reconstruction in a errorless way,
+% when sign(U), problems generate
 for k = 1:length(n)-1
     C = reshape(C,[tr(k)*n(k), prod(size(C))/(tr(k)*n(k))]);tr(k+1) = rank(C);
     if r(k+1)> tr(k+1)
-        fprintf('Input rank should be less than rank of tensor');
+        fprintf('Input rank should be less than rank of tensor\n');
         return
+    elseif r(k+1)<tr(k+1)
+        fprintf('truncate by r input\n');
     end
-    [U,S,V] = svd(C);
+    [U{k},S{k},V{k}] = svd(C);
     if bt(k) == 1% binary
-        tU = sign((U*10));
+        tU = sign((U*1));
     elseif bt(k) == 2
-        tU = sign(round(U*10));% when matrix is larger, svd decomposition makes its value smaller
+        tU = sign(round(U{k}*size(U{k},2)/(2*sum(abs(U{k}(1,:))))));% when matrix is larger, svd decomposition makes its value smaller
     end
-    E = C - pinv(tU)*C;
-    C = pinv(tU)*C;
-    C = C(1:r(k+1),:);
-    error = norm(E,'fro')
+    tC = pinv(tU)*C;
+    E = C - tU*(pinv(tU)*C);
+    
+    C = tC(1:r(k+1),:);
+    error = norm(E,'fro'); fprintf('svd error norm %f\n',error);
     G{k} = reshape(tU(:,1:r(k+1)),[r(k),n(k),r(k+1)]);
     tr(k+1) = r(k+1);
 end
