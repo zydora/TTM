@@ -10,7 +10,7 @@ for i = 1:r
     M(:,i) =sign(round(randn(size(W,1),1)));
     
     iter = 0;
-    while(1)&&(iter<100)
+    while(1)&&(iter<60)
         a(i,:) = (M(:,i)'*R/(M(:,i)'*M(:,i)));
          index  = -2^(bits-1):1:2^(bits-1);tempsum = zeros(1,length(index));
         for j = 1:size(W,1)
