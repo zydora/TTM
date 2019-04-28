@@ -5,7 +5,7 @@ for i = 1:indexG
     n(i) = size(G{i},2);
     r(i) = size(G{i},1);
 end
-r(indexG+1) = 1;
+r(indexG+1) = size(G{end},length(size(G{end})));
 
 %% product
 temp = G{1};dim = size(G{1});
