@@ -41,8 +41,8 @@ for j = 1:r
                 MM = MM-1;
                 M(j,:) = MM;
                 if mod(k,10000)==0
-                    batch = batch+1;
-                    fprintf('batch %d ends, total %d\n',batch,3^r/10000);
+                    batch1 = batch1+1;
+                    fprintf('batch %d ends, total %d\n',batch1,3^r/10000);
                 end
             end
             iter = iter + 1;

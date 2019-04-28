@@ -7,7 +7,7 @@ MM = Gen_ind([1,2,3],r)-2;
     Index =  randperm(size(MM,1));
     %Index = Index(1);
     for i = 1:size(x,1)
-    M(i,:) = MM(Index(i),:);
+    M(i,:) = MM(Index(mod(i,size(MM,1))+1),:);
     end
     b = 5;
     iter = 0;
